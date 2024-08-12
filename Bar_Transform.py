@@ -3,11 +3,12 @@ import pandas as pd
 from summarizer import summarize
 from Deepseek_llm import DeepSeekTextGenerator
 import json
+from Utils import filter_data
 
 
 class Bar_Transform(Data_Transform):
-    def __init__(self, data_file_url: str, aggregate: str, encoding: str):
-        super().__init__(data_file_url, aggregate, encoding)
+    def __init__(self, data_file_url: str, filter: str, aggregate: str, encoding: str):
+        super().__init__(data_file_url, aggregate, encoding, filter)
         self.fields_dict = self.data_summary()
         self.mark = "bar"
         self.group = self.judge_group()
@@ -16,7 +17,6 @@ class Bar_Transform(Data_Transform):
         textgen = DeepSeekTextGenerator()
         summary = summarize(textgen, self.file_url)
         fields = summary['fields']
-        print(fields)
         fields_dict = dict()
         for field in fields:
             fields_dict[field['column']] = field["properties"]['visualization_type']
@@ -39,6 +39,8 @@ class Bar_Transform(Data_Transform):
 
     def transform(self):
         df = pd.read_csv(self.file_url)
+        #对数据进行过滤
+        df = filter_data(df, self.filter)
         unique_color = ""
         merged_df = pd.DataFrame()
         # 判断 groupby的类型是否为 "temporal"
@@ -111,7 +113,7 @@ class Bar_Transform(Data_Transform):
 
 if __name__ == '__main__':
     data_file_url = r"C:\gitplace\TinyAgent\spider_csv\college_2_instructor.csv"
-    aggregate = "count Winery"
+    aggregate = "mean salary"
     encodings = "x=dept_name,y=mean salary,color=none,size=none"
     trans = Bar_Transform(data_file_url, aggregate, encodings)
     print(trans.transform())

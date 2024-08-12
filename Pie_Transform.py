@@ -17,6 +17,7 @@ class Pie_Transform(Data_Transform):
             })
         elif self.aggregate["aggregate"] == "count":
             merged_df = df[self.encoding["x"]].value_counts().reset_index()
+            merged_df.columns = [self.encoding["x"], "count"]
         else:
             merged_df = df.groupby(self.encoding["x"]).agg({
                 self.aggregate["field"]: self.aggregate["aggregate"]
