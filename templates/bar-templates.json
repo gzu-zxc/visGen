@@ -1,0 +1,30 @@
+{
+  "dataset": [
+    {
+    "dimensions":["name",
+        "good",
+        "open",
+        "close",
+        "highest",
+        "lowest"],
+    "source": [
+      ["a", 12, 44, 55, 66, 2],
+      ["b", 23, 6, 16, 23, 1],
+      ["c", 23, 6, 16, 23, 1]
+    ]
+  }
+  ],
+  "yAxis": {},
+  "xAxis": {
+    "type": "category"
+  },
+  "series": [
+    {
+      "type": "bar",
+      "encode": {
+        "x": "name",
+        "y": "open"
+      }
+    }
+  ]
+}
