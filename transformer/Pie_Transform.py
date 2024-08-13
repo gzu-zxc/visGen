@@ -16,13 +16,23 @@ class Pie_Transform(Data_Transform):
         merged_df = pd.DataFrame()
         if self.aggregate == "none":
             merged_df = df.groupby(self.encoding["x"]).agg({
-                self.aggregate["field"]: "sum"
-            })
+                self.encoding["y"]: "sum"
+            }).reset_index()
         elif self.aggregate["aggregate"] == "count":
             merged_df = df[self.encoding["x"]].value_counts().reset_index()
         else:
             merged_df = df.groupby(self.encoding["x"]).agg({
-                self.aggregate["field"]: self.aggregate["aggregate"]
-            })
+                self.encoding["y"]: self.aggregate["aggregate"]
+            }).reset_index()
+        print(merged_df)
         merged_df.fillna(0, inplace=True)
         return df_for_list(merged_df)
+
+if __name__ == '__main__':
+    data_file_url = r"../spider_csv/soccer_2_College.csv"
+    aggregate = "none"
+    encodings = "x=state,y=enr,color=none,size=none"
+    filter = "none"
+    trans = Pie_Transform(data_file_url, filter,aggregate, encodings)
+    print(trans.transform())
+

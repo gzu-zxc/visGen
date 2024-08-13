@@ -24,6 +24,7 @@ def gen_fields_type(file_url):
 
 def df_for_list(df):
     list_of_columns = df.columns.tolist()
+    print(list_of_columns)
     list_of_rows = df.values.tolist()
     list_of_rows.insert(0, list_of_columns)
     return list_of_rows

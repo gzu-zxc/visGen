@@ -29,7 +29,7 @@ class Line_Transform(Data_Transform):
         elif self.aggregate["aggregate"] == "count":
             merged_df = df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME'))[self.group['grouped']].count().reset_index()
             merged_df[self.group['groupby']] = merged_df[self.group['groupby']].dt.strftime('%Y-%m')
-            merged_df = merged_df.groupby([self.group['groupby']]).agg({self.group['grouped']: "sum"})
+            merged_df = merged_df.groupby([self.group['groupby']]).agg({self.group['grouped']: "sum"}).reset_index()
         else:
             merged_df = df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME'))[self.group['grouped']].agg({self.group['grouped']: self.aggregate["aggregate"]}).reset_index()
             # 将时间戳转换为 %Y-%m 格式

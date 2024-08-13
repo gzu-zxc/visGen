@@ -44,8 +44,7 @@ class Bar_Transform(Data_Transform):
                 for field in unique_color:
                     filtered_df = df[df[self.encoding["color"]] == field]
                     if self.aggregate == "none":
-                        grouped_df = filtered_df.groupby(pd.Grouper(key=self.group['groupby'], freq='M'))[
-                            self.group['grouped']].sum().reset_index()
+                        grouped_df = filtered_df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME'))[self.group['grouped']].sum().reset_index()
                     elif self.aggregate["aggregate"] == "count":
                         grouped_df = filtered_df[self.group['groupby']].value_counts().reset_index()
                         grouped_df.columns = [self.group['groupby'], "count"]
@@ -69,14 +68,12 @@ class Bar_Transform(Data_Transform):
                     if self.aggregate == "none":
                         grouped_df = filtered_df.groupby(self.group['groupby']).agg({
                             self.group['grouping']: "sum"
-                        })
+                        }).reset_index()
                     elif self.aggregate["aggregate"] == "count":
                         grouped_df = filtered_df[self.group['groupby']].value_counts().reset_index()
 
                     else:
-                        grouped_df = filtered_df.groupby(self.group['groupby']).agg({
-                            self.aggregate["field"]: self.aggregate["aggregate"]
-                        })
+                        grouped_df = filtered_df.groupby(self.group['groupby']).agg({self.aggregate["field"]: self.aggregate["aggregate"]}).reset_index()
                     grouped_df.columns = [self.group['groupby'], field]
                     dfs.append(grouped_df)
                 merged_df = dfs.pop(0)
@@ -87,7 +84,7 @@ class Bar_Transform(Data_Transform):
                     # 当 aggregate 为 none 时，就将其聚合为sum
                     merged_df = df.groupby(self.group['groupby']).agg({
                         self.group['grouped']: "sum"
-                    })
+                    }).reset_index()
                     # 当 aggregate 为 count 时
                 elif self.aggregate["aggregate"] == "count":
                     merged_df = df[self.group['groupby']].value_counts().reset_index()
@@ -96,7 +93,7 @@ class Bar_Transform(Data_Transform):
                     # 当 aggregate 为 其他时
                     merged_df = df.groupby(self.group['groupby']).agg({
                         self.group['grouped']: self.aggregate["aggregate"]
-                    })
+                    }).reset_index()
             merged_df.fillna(0, inplace=True)
 
         return df_for_list(merged_df)

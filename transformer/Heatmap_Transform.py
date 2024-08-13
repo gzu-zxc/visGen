@@ -13,12 +13,12 @@ class Heatmap_Transform(Data_Transform):
         df = filter_data(df, self.filter)
         merged_df = pd.DataFrame()
         if self.aggregate == "none":
-            merged_df = df.groupby([self.encoding["x"], self.encoding["y"]]).agg({self.encoding["color"]: "sum"})
+            merged_df = df.groupby([self.encoding["x"], self.encoding["y"]]).agg({self.encoding["color"]: "sum"}).reset_index()
         else:
             if self.aggregate["aggregate"] == "count":
                 merged_df = df.groupby(["day_of_week", "station_id"]).size().reset_index()
                 merged_df = merged_df.rename(columns={merged_df.columns[2]: 'count'})
             else:
                 merged_df = df.groupby([self.encoding["x"], self.encoding["y"]]).agg(
-                    {self.encoding["color"]: self.aggregate["aggregate"]})
+                    {self.encoding["color"]: self.aggregate["aggregate"]}).reset_index()
         return df_for_list(merged_df)
