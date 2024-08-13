@@ -1,26 +1,17 @@
 from Data_Transform import Data_Transform
 import pandas as pd
-from summarizer import summarize
-from Deepseek_llm import DeepSeekTextGenerator
-import json
-from Utils import filter_data
+from LLM.summarizer import summarize
+from LLM.Deepseek_llm import DeepSeekTextGenerator
+from Utils import filter_data,gen_fields_type
 
 
 class Bar_Transform(Data_Transform):
     def __init__(self, data_file_url: str, filter: str, aggregate: str, encoding: str):
-        super().__init__(data_file_url, aggregate, encoding, filter)
-        self.fields_dict = self.data_summary()
+        super().__init__(data_file_url, filter, aggregate, encoding)
+        self.fields_dict = gen_fields_type(data_file_url)
         self.mark = "bar"
         self.group = self.judge_group()
 
-    def data_summary(self):
-        textgen = DeepSeekTextGenerator()
-        summary = summarize(textgen, self.file_url)
-        fields = summary['fields']
-        fields_dict = dict()
-        for field in fields:
-            fields_dict[field['column']] = field["properties"]['visualization_type']
-        return fields_dict
 
     def judge_group(self):
 
@@ -39,7 +30,7 @@ class Bar_Transform(Data_Transform):
 
     def transform(self):
         df = pd.read_csv(self.file_url)
-        #对数据进行过滤
+        # 对数据进行过滤
         df = filter_data(df, self.filter)
         unique_color = ""
         merged_df = pd.DataFrame()
@@ -64,7 +55,7 @@ class Bar_Transform(Data_Transform):
                     else:
                         grouped_df = filtered_df.groupby(pd.Grouper(key=self.group['groupby'], freq='M')).agg({
                             self.group['grouped']: self.aggregate["aggregate"]
-                        })
+                        }).reset_index()
                     grouped_df.columns = [self.group['groupby'], field]
                     dfs.append(grouped_df)
                 merged_df = dfs.pop(0)
@@ -112,7 +103,7 @@ class Bar_Transform(Data_Transform):
 
 
 if __name__ == '__main__':
-    data_file_url = r"C:\gitplace\TinyAgent\spider_csv\college_2_instructor.csv"
+    data_file_url = r"../spider_csv/college_2_instructor.csv"
     aggregate = "mean salary"
     encodings = "x=dept_name,y=mean salary,color=none,size=none"
     trans = Bar_Transform(data_file_url, aggregate, encodings)

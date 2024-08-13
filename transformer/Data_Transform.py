@@ -1,8 +1,9 @@
 class Data_Transform():
-    def __init__(self, file_url: str, aggregate: str, encoding: str):
+    def __init__(self, file_url: str, filter: str, aggregate: str, encoding: str):
         self.file_url = file_url
         self.aggregate = self.transform_aggregate(aggregate)
         self.encoding = self.transform_encoding(encoding)
+        self.filter = filter
 
     def transform_aggregate(self, aggregate):
         if aggregate == 'none':

@@ -1,15 +1,18 @@
 from Data_Transform import Data_Transform
 import pandas as pd
+from Utils import filter_data
 
 
 class Pie_Transform(Data_Transform):
-    def __init__(self, file_url: str, aggregate: str, encoding: str):
-        super().__init__(file_url, aggregate, encoding)
+    def __init__(self, data_file_url: str, filter: str, aggregate: str, encoding: str):
+        super().__init__(data_file_url, filter, aggregate, encoding)
         self.mark = "arc"
 
+    # pie 默认 x轴是类别，y轴是值
     def transform(self):
         df = pd.read_csv(self.file_url)
-        unique_color = ""
+        # 对数据进行过滤
+        df = filter_data(df, self.filter)
         merged_df = pd.DataFrame()
         if self.aggregate == "none":
             merged_df = df.groupby(self.encoding["x"]).agg({
@@ -17,7 +20,6 @@ class Pie_Transform(Data_Transform):
             })
         elif self.aggregate["aggregate"] == "count":
             merged_df = df[self.encoding["x"]].value_counts().reset_index()
-            merged_df.columns = [self.encoding["x"], "count"]
         else:
             merged_df = df.groupby(self.encoding["x"]).agg({
                 self.aggregate["field"]: self.aggregate["aggregate"]

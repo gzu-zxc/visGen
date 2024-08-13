@@ -1,5 +1,5 @@
 import logging
-from datacleaning import read_dataframe, get_column_properties
+from LLM.datacleaning import read_dataframe, get_column_properties
 import json
 from text_generator import TextGenerator
 
