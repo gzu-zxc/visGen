@@ -1,6 +1,6 @@
 from typing import Union, List
-from openai import  OpenAI
-from text_generator import TextGenerator
+from openai import OpenAI
+from LLM.text_generator import TextGenerator
 
 
 class DeepSeekTextGenerator(TextGenerator):
@@ -12,7 +12,7 @@ class DeepSeekTextGenerator(TextGenerator):
         self.model_name = "deepseek-coder"
 
         client_args = {
-            "api_key": "",
+            "api_key": "sk-53d4d5d9be4c4ad39eaa49c9326c8320",
             "base_url": "https://api.deepseek.com/v1"
         }
         self.client = OpenAI(**client_args)
@@ -21,7 +21,6 @@ class DeepSeekTextGenerator(TextGenerator):
             self,
             messages: Union[List[dict], str],
     ):
-
         return self.client.chat.completions.create(model=self.model_name, messages=messages, stream=False,
                                                    temperature=0.0).choices[0].message.content
 

@@ -22,6 +22,12 @@ def gen_fields_type(file_url):
         fields_dict[field['column']] = field["properties"]['visualization_type']
     return fields_dict
 
+def df_for_list(df):
+    list_of_columns = df.columns.tolist()
+    list_of_rows = df.values.tolist()
+    list_of_rows.insert(0, list_of_columns)
+    return list_of_rows
+
 
 if __name__ == '__main__':
     df = pd.DataFrame({

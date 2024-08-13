@@ -1,7 +1,7 @@
 import logging
 from LLM.datacleaning import read_dataframe, get_column_properties
 import json
-from text_generator import TextGenerator
+from LLM.text_generator import TextGenerator
 
 logger = logging.getLogger("zxc")
 

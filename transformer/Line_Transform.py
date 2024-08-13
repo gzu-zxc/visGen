@@ -1,6 +1,6 @@
 from Data_Transform import Data_Transform
 import pandas as pd
-from Utils import gen_fields_type, filter_data
+from Utils import gen_fields_type, filter_data,df_for_list
 
 
 class Line_Transform(Data_Transform):
@@ -34,4 +34,4 @@ class Line_Transform(Data_Transform):
             merged_df = df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME'))[self.group['grouped']].agg({self.group['grouped']: self.aggregate["aggregate"]}).reset_index()
             # 将时间戳转换为 %Y-%m 格式
             merged_df[self.group['groupby']] = merged_df[self.group['groupby']].dt.strftime('%Y-%m')
-        return merged_df
+        return df_for_list(merged_df)

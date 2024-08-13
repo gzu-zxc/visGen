@@ -1,6 +1,6 @@
 from Data_Transform import Data_Transform
 import pandas as pd
-from Utils import filter_data
+from Utils import filter_data,df_for_list
 
 
 class Pie_Transform(Data_Transform):
@@ -25,4 +25,4 @@ class Pie_Transform(Data_Transform):
                 self.aggregate["field"]: self.aggregate["aggregate"]
             })
         merged_df.fillna(0, inplace=True)
-        return merged_df
+        return df_for_list(merged_df)

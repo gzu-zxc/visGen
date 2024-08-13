@@ -1,6 +1,6 @@
 from Data_Transform import Data_Transform
 import pandas as pd
-from Utils import filter_data, gen_fields_type
+from Utils import filter_data, gen_fields_type,df_for_list
 
 
 class Heatmap_Transform(Data_Transform):
@@ -21,4 +21,4 @@ class Heatmap_Transform(Data_Transform):
             else:
                 merged_df = df.groupby([self.encoding["x"], self.encoding["y"]]).agg(
                     {self.encoding["color"]: self.aggregate["aggregate"]})
-        return merged_df
+        return df_for_list(merged_df)

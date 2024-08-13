@@ -2,7 +2,7 @@ from Data_Transform import Data_Transform
 import pandas as pd
 from LLM.summarizer import summarize
 from LLM.Deepseek_llm import DeepSeekTextGenerator
-from Utils import filter_data,gen_fields_type
+from Utils import filter_data,gen_fields_type,df_for_list
 
 
 class Bar_Transform(Data_Transform):
@@ -22,8 +22,8 @@ class Bar_Transform(Data_Transform):
             else:
                 return {"groupby": self.encoding["x"], "grouped": self.encoding["y"].split()[1]}
         else:
-            if self.fields_dict[self.encoding["x"]] == "nominal" and self.fields_dict[
-                self.encoding["x"]] == "temporal" and self.fields_dict[self.encoding["x"]] == "ordinal":
+            if self.fields_dict[self.encoding["x"]] == "nominal" or self.fields_dict[
+                self.encoding["x"]] == "temporal" or self.fields_dict[self.encoding["x"]] == "ordinal":
                 return {"groupby": self.encoding["x"], "grouped": self.encoding["y"]}
             else:
                 return {"groupby": self.encoding["y"], "grouped": self.encoding["x"]}
@@ -50,17 +50,16 @@ class Bar_Transform(Data_Transform):
                         grouped_df = filtered_df[self.group['groupby']].value_counts().reset_index()
                         grouped_df.columns = [self.group['groupby'], "count"]
                         # 按月进行分组
-                        grouped_df = grouped_df.groupby(pd.Grouper(key=self.group['groupby'], freq='M'))[
-                            "count"].sum().reset_index()
+                        grouped_df = grouped_df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME'))["count"].sum().reset_index()
                     else:
-                        grouped_df = filtered_df.groupby(pd.Grouper(key=self.group['groupby'], freq='M')).agg({
-                            self.group['grouped']: self.aggregate["aggregate"]
-                        }).reset_index()
+                        grouped_df = filtered_df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME')).agg({self.group['grouped']: self.aggregate["aggregate"]}).reset_index()
                     grouped_df.columns = [self.group['groupby'], field]
+                    grouped_df[self.group['groupby']] = grouped_df[self.group['groupby']].dt.strftime('%Y-%m')
                     dfs.append(grouped_df)
                 merged_df = dfs.pop(0)
                 for df_temp in dfs:
                     merged_df = pd.merge(merged_df, df_temp, on=merged_df.columns[0], how='outer')
+
         else:
             if self.encoding["color"] != "none":
                 unique_color = df[self.encoding["color"]].unique()
@@ -99,14 +98,14 @@ class Bar_Transform(Data_Transform):
                         self.group['grouped']: self.aggregate["aggregate"]
                     })
             merged_df.fillna(0, inplace=True)
-        return merged_df
+
+        return df_for_list(merged_df)
 
 
 if __name__ == '__main__':
-    data_file_url = r"../spider_csv/college_2_instructor.csv"
-    aggregate = "mean salary"
-    encodings = "x=dept_name,y=mean salary,color=none,size=none"
-    trans = Bar_Transform(data_file_url, aggregate, encodings)
+    data_file_url = r"../spider_csv/behavior_monitoring_Student_Addresses.csv"
+    aggregate = "count date_address_to"
+    encodings = "x=date_address_to,y=count date_address_to,color=other_details,size=none"
+    filter = "none"
+    trans = Bar_Transform(data_file_url, filter,aggregate, encodings)
     print(trans.transform())
-    trans.transform().to_csv('output_selected_columns.csv')
-    # print(trans.data_summary())
