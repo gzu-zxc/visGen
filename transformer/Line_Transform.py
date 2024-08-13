@@ -19,7 +19,8 @@ class Line_Transform(Data_Transform):
 
     def transform(self):
         df = pd.read_csv(self.file_url)
-        # 这里后续需要保证是能转换为时间戳
+        df = filter_data(df, self.filter)
+        # 这里后续需要保证数据是能转换为时间戳
         df[self.group['groupby']] = pd.to_datetime(df[self.group['groupby']])
         if self.aggregate == "none":
             # 使用 pd.Grouper(freq='M') 来按月分组
