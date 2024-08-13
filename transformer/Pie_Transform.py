@@ -29,9 +29,9 @@ class Pie_Transform(Data_Transform):
         return df_for_list(merged_df)
 
 if __name__ == '__main__':
-    data_file_url = r"../spider_csv/soccer_2_College.csv"
-    aggregate = "none"
-    encodings = "x=state,y=enr,color=none,size=none"
+    data_file_url = r"../spider_csv/cre_Docs_and_Epenses_Documents.csv"
+    aggregate = "count Document_Type_Code"
+    encodings = "x=Document_Type_Code,y=count Document_Type_Code,color=none,size=none"
     filter = "none"
     trans = Pie_Transform(data_file_url, filter,aggregate, encodings)
     print(trans.transform())

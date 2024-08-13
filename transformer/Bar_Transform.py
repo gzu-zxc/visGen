@@ -45,15 +45,16 @@ class Bar_Transform(Data_Transform):
                     filtered_df = df[df[self.encoding["color"]] == field]
                     if self.aggregate == "none":
                         grouped_df = filtered_df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME'))[self.group['grouped']].sum().reset_index()
+                        grouped_df[self.group['groupby']] = grouped_df[self.group['groupby']].dt.strftime('%Y-%m')
                     elif self.aggregate["aggregate"] == "count":
                         grouped_df = filtered_df[self.group['groupby']].value_counts().reset_index()
-                        grouped_df.columns = [self.group['groupby'], "count"]
+                        grouped_df[self.group['groupby']] = grouped_df[self.group['groupby']].dt.strftime('%Y-%m')
                         # 按月进行分组
-                        grouped_df = grouped_df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME'))["count"].sum().reset_index()
+                        grouped_df = grouped_df.groupby(self.group['groupby'])["count"].sum().reset_index()
                     else:
                         grouped_df = filtered_df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME')).agg({self.group['grouped']: self.aggregate["aggregate"]}).reset_index()
+                        grouped_df[self.group['groupby']] = grouped_df[self.group['groupby']].dt.strftime('%Y-%m')
                     grouped_df.columns = [self.group['groupby'], field]
-                    grouped_df[self.group['groupby']] = grouped_df[self.group['groupby']].dt.strftime('%Y-%m')
                     dfs.append(grouped_df)
                 merged_df = dfs.pop(0)
                 for df_temp in dfs:
@@ -71,7 +72,6 @@ class Bar_Transform(Data_Transform):
                         }).reset_index()
                     elif self.aggregate["aggregate"] == "count":
                         grouped_df = filtered_df[self.group['groupby']].value_counts().reset_index()
-
                     else:
                         grouped_df = filtered_df.groupby(self.group['groupby']).agg({self.aggregate["field"]: self.aggregate["aggregate"]}).reset_index()
                     grouped_df.columns = [self.group['groupby'], field]

@@ -13,9 +13,9 @@ class Line_Transform(Data_Transform):
     def judge_group(self):
         # line 暂时只认为 temporal 类型为 groupby
         if self.fields_dict[self.encoding["x"]] == "temporal":
-            return {"groupby": self.encoding["x"], "grouped": self.encoding["y"]}
+            return {"groupby": self.encoding["x"], "grouped": self.encoding["y"].split()[1]}
         else:
-            return {"groupby": self.encoding["y"], "grouped": self.encoding["x"]}
+            return {"groupby": self.encoding["y"], "grouped": self.encoding["x"].split()[1]}
 
     def transform(self):
         df = pd.read_csv(self.file_url)
@@ -27,11 +27,19 @@ class Line_Transform(Data_Transform):
             merged_df = df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME'))[self.group['grouped']].sum().reset_index()
             merged_df[self.group['groupby']] = merged_df[self.group['groupby']].dt.strftime('%Y-%m')
         elif self.aggregate["aggregate"] == "count":
-            merged_df = df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME'))[self.group['grouped']].count().reset_index()
+            merged_df = df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME')).value_counts().reset_index()
             merged_df[self.group['groupby']] = merged_df[self.group['groupby']].dt.strftime('%Y-%m')
-            merged_df = merged_df.groupby([self.group['groupby']]).agg({self.group['grouped']: "sum"}).reset_index()
+            merged_df = merged_df.groupby([self.group['groupby']]).agg({"count": "sum"}).reset_index()
         else:
-            merged_df = df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME'))[self.group['grouped']].agg({self.group['grouped']: self.aggregate["aggregate"]}).reset_index()
+            merged_df = df.groupby(pd.Grouper(key=self.group['groupby'], freq='ME')).agg({self.group['grouped']: self.aggregate["aggregate"]}).reset_index()
             # 将时间戳转换为 %Y-%m 格式
             merged_df[self.group['groupby']] = merged_df[self.group['groupby']].dt.strftime('%Y-%m')
         return df_for_list(merged_df)
+
+if __name__ == '__main__':
+    data_file_url = r"../spider_csv/cre_Doc_Control_Systems_Documents.csv"
+    aggregate = "count receipt_date"
+    encodings = "x=receipt_date,y=count receipt_date,color=none,size=none"
+    filter = "none"
+    trans = Line_Transform(data_file_url, filter,aggregate, encodings)
+    print(trans.transform())
