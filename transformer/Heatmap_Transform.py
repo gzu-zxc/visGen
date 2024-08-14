@@ -1,6 +1,6 @@
 from transformer.Data_Transform import Data_Transform
 import pandas as pd
-from Utils import filter_data, gen_fields_type,df_for_list
+from Utils import filter_data, gen_fields_type, df_for_list
 
 
 class Heatmap_Transform(Data_Transform):
@@ -12,18 +12,20 @@ class Heatmap_Transform(Data_Transform):
     # 可能会有x,y轴都是temporal
     def judge_temporal(self):
         if self.fields_dict[self.encoding["x"]] == "temporal" and self.fields_dict[self.encoding["y"]] != "temporal":
-            return {"temporal":self.encoding["x"],"no_temporal":self.encoding["y"]}
+            return {"temporal": self.encoding["x"], "no_temporal": self.encoding["y"]}
         elif self.fields_dict[self.encoding["y"]] == "temporal" and self.fields_dict[self.encoding["x"]] != "temporal":
-            return {"temporal":self.encoding["y"],"no_temporal":self.encoding["x"]}
+            return {"temporal": self.encoding["y"], "no_temporal": self.encoding["x"]}
         else:
             return None
+
     def transform(self):
         df = pd.read_csv(self.file_url)
         df = filter_data(df, self.filter)
         merged_df = pd.DataFrame()
         if not self.judge_temporal():
             if self.aggregate == "none":
-                merged_df = df.groupby([self.encoding["x"], self.encoding["y"]]).agg({self.encoding["color"]: "sum"}).reset_index()
+                merged_df = df.groupby([self.encoding["x"], self.encoding["y"]]).agg(
+                    {self.encoding["color"]: "sum"}).reset_index()
             else:
                 if self.aggregate["aggregate"] == "count":
                     merged_df = df.groupby([self.encoding["x"], self.encoding["y"]]).size().reset_index()
@@ -34,22 +36,30 @@ class Heatmap_Transform(Data_Transform):
         else:
             df[self.judge_temporal()['temporal']] = pd.to_datetime(df[self.judge_temporal()['temporal']])
             if self.aggregate == "none":
-                grouped_df = df.groupby([pd.Grouper(key=self.judge_temporal()['temporal'], freq='D'),self.judge_temporal()['no_temporal']])[self.encoding["color"]].sum().reset_index()
-                grouped_df[self.judge_temporal()['temporal']] = grouped_df[self.judge_temporal()['temporal']].dt.strftime('%Y-%m-%d')
+                grouped_df = df.groupby([pd.Grouper(key=self.judge_temporal()['temporal'], freq='D'),
+                                         self.judge_temporal()['no_temporal']])[
+                    self.encoding["color"]].sum().reset_index()
+                grouped_df[self.judge_temporal()['temporal']] = grouped_df[
+                    self.judge_temporal()['temporal']].dt.strftime('%Y-%m-%d')
             elif self.aggregate["aggregate"] == "count":
-                grouped_df = df.groupby([self.judge_temporal()['temporal'], self.judge_temporal()['no_temporal']]).size().reset_index(name='count')
-                grouped_df[self.judge_temporal()['temporal']] = grouped_df[self.judge_temporal()['temporal']].dt.strftime('%Y-%m-%d')
+                grouped_df = df.groupby(
+                    [self.judge_temporal()['temporal'], self.judge_temporal()['no_temporal']]).size().reset_index(
+                    name='count')
+                grouped_df[self.judge_temporal()['temporal']] = grouped_df[
+                    self.judge_temporal()['temporal']].dt.strftime('%Y-%m-%d')
                 # 按月进行分组
                 merged_df = grouped_df.groupby(self.judge_temporal()['temporal'])["count"].sum().reset_index()
             else:
                 merged_df = df.groupby([pd.Grouper(key=self.judge_temporal()['temporal'], freq='D'),self.judge_temporal()['no_temporal']]).agg({self.aggregate["field"]: self.aggregate["aggregate"]}).reset_index()
-                merged_df[self.judge_temporal()['temporal']] = merged_df[self.judge_temporal()['temporal']].dt.strftime('%Y-%m-%d')
+                merged_df[self.judge_temporal()['temporal']] = merged_df[self.judge_temporal()['temporal']].dt.strftime(
+                    '%Y-%m-%d')
         return df_for_list(merged_df)
 
+
 if __name__ == '__main__':
-    data_file_url = r"../spider_csv/flight_1_Flight.csv"
-    aggregate = "mean price"
-    encodings = "x=origin,y=destination,color=mean price,size=none"
-    filter = "none"
-    trans = Heatmap_Transform(data_file_url, filter,aggregate, encodings)
+    data_file_url = r"../spider_csv/culture_company_movie.csv"
+    aggregate = "count Budget_million,Gross_worldwide"
+    encodings = "x=Budget_million,y=Gross_worldwide,color=count Budget_million and Gross_worldwide,size=none"
+    filter = "Budget_million > 20 and Gross_worldwide > 1000000"
+    trans = Heatmap_Transform(data_file_url, filter, aggregate, encodings)
     print(trans.transform())

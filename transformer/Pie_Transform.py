@@ -1,4 +1,4 @@
-from Data_Transform import Data_Transform
+from transformer.Data_Transform import Data_Transform
 import pandas as pd
 from Utils import filter_data,df_for_list
 
@@ -22,7 +22,7 @@ class Pie_Transform(Data_Transform):
             merged_df = df[self.encoding["x"]].value_counts().reset_index()
         else:
             merged_df = df.groupby(self.encoding["x"]).agg({
-                self.encoding["y"]: self.aggregate["aggregate"]
+                self.encoding["y"].split()[1]: self.aggregate["aggregate"]
             }).reset_index()
         print(merged_df)
         merged_df.fillna(0, inplace=True)
