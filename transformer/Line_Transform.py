@@ -3,6 +3,7 @@ import pandas as pd
 from Utils import gen_fields_type, filter_data,df_for_list
 
 
+# Line 与 Area 的数据转换相同
 class Line_Transform(Data_Transform):
     def __init__(self, data_file_url: str, filter: str, aggregate: str, encoding: str):
         super().__init__(data_file_url, filter, aggregate, encoding)

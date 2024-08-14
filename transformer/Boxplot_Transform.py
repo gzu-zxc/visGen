@@ -1,11 +1,11 @@
-from Data_Transform import Data_Transform
 import pandas as pd
-from LLM.summarizer import summarize
-from LLM.Deepseek_llm import DeepSeekTextGenerator
+
+from Data_Transform import Data_Transform
 from Utils import filter_data, gen_fields_type
 
 
 class Boxplot_Transform(Data_Transform):
+
     def __init__(self, data_file_url: str, filter: str, aggregate: str, encoding: str):
         super().__init__(data_file_url, filter, aggregate, encoding)
         self.fields_dict = gen_fields_type(data_file_url)

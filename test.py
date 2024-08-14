@@ -1,20 +1,11 @@
-import pandas as pd
+nested_list = [[1, "a", 3], [4, 5, "b"], ["c", 6, 7]]
 
-# 创建一个示例DataFrame
-df = pd.DataFrame({
-    'A': [1, 2, 5, 6],
-    'B': [4, 5, 6, 4],
-    'C': ['a', 'b', 'c', 'a']
-})
-merged_df = df[df['C'] == 'a']
-a = merged_df['B'].tolist()
-a.insert(0,'a')
-print(a)
+# 提取所有数字
+numbers = [item for sublist in nested_list for item in sublist if isinstance(item, (int, float))]
 
-print(merged_df)
-# 将DataFrame的每一行转换为列表，并将这些列表存储在一个列表中
-# list_of_columns = merged_df.columns.tolist()
-list_of_rows = merged_df['A'].tolist()
-list_of_rows.insert(0, 'A')
+# 计算最大值和最小值
+max_value = max(numbers) if numbers else None
+min_value = min(numbers) if numbers else None
 
-print(list_of_rows)
+print("最大值:", max_value)
+print("最小值:", min_value)

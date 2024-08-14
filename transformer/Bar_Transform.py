@@ -100,9 +100,9 @@ class Bar_Transform(Data_Transform):
 
 
 if __name__ == '__main__':
-    data_file_url = r"../spider_csv/behavior_monitoring_Student_Addresses.csv"
-    aggregate = "count date_address_to"
-    encodings = "x=date_address_to,y=count date_address_to,color=other_details,size=none"
+    data_file_url = r"../spider_csv/station_weather_weekly_weather.csv"
+    aggregate = "mean high_temperature"
+    encodings = "x=day_of_week,y=mean high_temperature,color=none,size=none"
     filter = "none"
     trans = Bar_Transform(data_file_url, filter,aggregate, encodings)
     print(trans.transform())

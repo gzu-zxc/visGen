@@ -1,4 +1,5 @@
 class Data_Transform():
+
     def __init__(self, file_url: str, filter: str, aggregate: str, encoding: str):
         self.file_url = file_url
         self.aggregate = self.transform_aggregate(aggregate)
