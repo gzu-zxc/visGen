@@ -3,7 +3,7 @@ from LLM.summarizer import summarize
 from LLM.Deepseek_llm import DeepSeekTextGenerator
 
 
-def filter_data(data_df, filter_massage: str):
+def filter_data(data_df, filter_massage):
     """
     进行数据过滤
 

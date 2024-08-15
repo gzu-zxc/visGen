@@ -1,4 +1,4 @@
-from Data_Transform import Data_Transform
+from transformer.Data_Transform import Data_Transform
 import pandas as pd
 from LLM.summarizer import summarize
 from LLM.Deepseek_llm import DeepSeekTextGenerator
@@ -22,6 +22,14 @@ class Histogram_Transform(Data_Transform):
         df = pd.read_csv(self.file_url)
         # 对数据进行过滤
         df = filter_data(df, self.filter)
-        merged_df = df[self.group['groupby']].reset_index()
+        merged_df = df[[self.group['groupby']]]
         merged_df.fillna(0, inplace=True)
         return df_for_list(merged_df)
+
+if __name__ == '__main__':
+    data_file_url = r"../spider_csv/department_store_products.csv"
+    aggregate = "count product_price"
+    encodings = "x=count product_price,y=product_price,color=none,size=none"
+    filter = "product_price > 400"
+    trans = Histogram_Transform(data_file_url, filter, aggregate, encodings)
+    print(trans.transform())

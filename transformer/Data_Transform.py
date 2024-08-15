@@ -1,10 +1,11 @@
 class Data_Transform():
 
-    def __init__(self, file_url: str, filter: str, aggregate: str, encoding: str):
+    def __init__(self, file_url: str, filter: str, aggregate: str, encoding: str, sort:str):
         self.file_url = file_url
         self.aggregate = self.transform_aggregate(aggregate)
         self.encoding = self.transform_encoding(encoding)
         self.filter = filter
+        self.sort = self.transform_sort(sort)
 
     def transform_aggregate(self, aggregate):
         if aggregate == 'none':
@@ -14,7 +15,7 @@ class Data_Transform():
 
     def transform_encoding(self, encoding):
         pairs = [pair.split('=') for pair in encoding.split(',')]
-        #这里是区分 heatmap count的情况
+        # 这里是区分 heatmap count的情况
         if len(pairs) == 5:
             parts = encoding.split(',')
             # 创建一个空的字典来存储解析后的数据
@@ -37,8 +38,13 @@ class Data_Transform():
         return resulting_dict
 
     def transform_sort(self, sort):
+        if sort == 'none':
+            return "none"
         words = sort.split()
         return {"position": words[0], "direct": words[1]}
+
+    def generate(self):
+        pass
 
     def transform(self):
         pass
